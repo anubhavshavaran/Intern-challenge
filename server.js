@@ -16,3 +16,16 @@ const PORT = process.env.PORT
 app.listen(PORT, function () {
     console.log(`App is running at PORT:${PORT}...`);
 });
+
+process.on('uncaughtException', err => {
+    console.log(err.name, err.message);
+    console.log("Unhandles rejection... shutting down...");
+});
+
+process.on('unhandledRejection', err => {
+    console.log(err.name, err.message);
+    console.log("Unhandles rejection... shutting down...");
+    server.close(() => {
+        process.exit(1);
+    });
+});
