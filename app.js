@@ -1,13 +1,15 @@
 const express = require('express');
 const errorController = require('./utils/errorController');
+const AppError = require('./utils/appError');
 
 const app = express();
 app.use(express.json({ limit: '10kb' }));
 
-const userRouter = require('./routes/userRoutes');
-const AppError = require('./utils/appError');
+const userRouter = require('./routes/userRoute');
+const postRouter = require('./routes/postRoute');
 
 app.use('/api/users', userRouter);
+app.use('/api/posts', postRouter);
 
 app.use('/api/helloworld', (req, res, next) => {
     res.status(200).json({
