@@ -4,12 +4,12 @@ const catchAsync = require("../utils/catchAsync");
 exports.likePost = catchAsync(async (req, res, next) => {
     const postId = req.params.postId;
     const { _id: userId } = req.user;
-    
+
     const like = await Like.create({
         post: postId,
         user: userId
     });
-    
+
     res.status(200).json({
         status: 'success',
         data: {
@@ -20,8 +20,13 @@ exports.likePost = catchAsync(async (req, res, next) => {
 
 exports.unlikePost = catchAsync(async (req, res, next) => {
     const { _id: userId } = req.user;
+    const { postId } = req.params;
+
     await Like.findOneAndDelete({
-        user: userId
+        $and: [
+            { user: { $eq: userId } },
+            { post: { $eq: postId } }
+        ]
     });
 
     res.status(204).json({

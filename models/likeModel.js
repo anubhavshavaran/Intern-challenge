@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const Post = require("./postModel");
 
 const likeSchema = new mongoose.Schema({
@@ -14,18 +14,29 @@ const likeSchema = new mongoose.Schema({
     }
 });
 
+likeSchema.index({ user: 1, post: 1 }, { unique: true });
+
 likeSchema.statics.incrementLike = async function (postId) {
-    // const post = await Post.findByIdAndUpdate(postId, {
-    //     $inc: { likes: 1 }
-    // }, {
-    //     new: true,
-    //     runValidators: true
-    // });
-
-    const post = await Post.findById(postId);
-
-    console.log(post);
+    await Post.findByIdAndUpdate(postId, {
+        $inc: { likes: 1 }
+    }, {
+        new: false,
+        runValidators: true
+    });
 }
+
+likeSchema.statics.decrementLike = async function (postId) {
+    await Post.findByIdAndUpdate(postId, {
+        $inc: { likes: -1 }
+    }, {
+        new: false,
+        runValidators: true
+    });
+}
+
+likeSchema.pre('findOneAndDelete', function () {
+    this.constructor.decrementLike(this.post);
+});
 
 likeSchema.post('save', function () {
     this.constructor.incrementLike(this.post);
